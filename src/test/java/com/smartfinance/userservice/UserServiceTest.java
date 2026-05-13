@@ -2,8 +2,10 @@ package com.smartfinance.userservice;
 
 import com.smartfinance.userservice.dto.RegisterRequest;
 import com.smartfinance.userservice.dto.UserResponse;
+import com.smartfinance.userservice.entity.Role;
 import com.smartfinance.userservice.entity.User;
 import com.smartfinance.userservice.exception.UserExistException;
+import com.smartfinance.userservice.repository.RoleRepository;
 import com.smartfinance.userservice.repository.UserRepository;
 import com.smartfinance.userservice.security.CustomUserDetailsService;
 import com.smartfinance.userservice.security.JwtService;
@@ -32,6 +34,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private RoleRepository roleRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -63,13 +68,21 @@ public class UserServiceTest {
                     userToSave.setId(1L);
                     return userToSave;
                 });
+        
+        Role userRole = new Role();
+        userRole.setId(1L);
+        userRole.setName("ROLE_USER");
+
+        when(roleRepository.findByName("ROLE_USER"))
+                .thenReturn(Optional.of(userRole));
+        
         //Act
         UserResponse response = userService.register(request);
         //Assert
         assertNotNull(response);
         assertEquals(1L,response.id());
         assertEquals("christian", response.username());
-        assertEquals("ROLE_USER", response.role());
+        assertTrue(response.roles().contains("ROLE_USER"));
         assertTrue(response.enabled());
 
         verify(userRepository).findByUsername("christian");
@@ -90,7 +103,11 @@ public class UserServiceTest {
         //assertEquals("encoded-password", userCaptured.getPassword());
         assertThat(userCaptured.getPassword()).isEqualTo("encoded-password");
         //assertEquals("ROLE_USER", userCaptured.getRole());
-        assertThat(userCaptured.getRole()).isEqualTo("ROLE_USER");
+        assertTrue(
+                userCaptured.getRoles()
+                        .stream()
+                        .anyMatch(role -> role.getName().equals("ROLE_USER"))
+        );
         assertTrue(userCaptured.getEnabled());
         assertNotNull(userCaptured.getCreatedAt());
     }
