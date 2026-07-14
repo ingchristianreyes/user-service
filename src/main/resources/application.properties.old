@@ -1,5 +1,9 @@
 spring.application.name=user-service
 
+spring.datasource.url=jdbc:postgresql://localhost:5433/user_service_db
+spring.datasource.username=user_service_app
+spring.datasource.password=123456
+
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
@@ -7,10 +11,14 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.flyway.enabled=true
 spring.flyway.locations=classpath:db/migration
 
-jwt.secret=${JWT_SECRET:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
-jwt.expiration-ms=${JWT_EXPIRATION_MS:86400000}
+server.port=8080
+
+jwt.secret=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+jwt.expiration-ms=86400000
+
+spring.kafka.bootstrap-servers=localhost:9092
 
 spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
 spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer
 
-app.kafka.topics.user-metrics=${USER_METRICS_TOPIC:user.metrics}
+app.kafka.topics.user-metrics=user.metrics
